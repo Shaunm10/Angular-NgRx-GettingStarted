@@ -7,6 +7,7 @@ import { Product } from "../product";
 import * as fromRoot from '../../state/app.state';
 import { createFeatureSelector, createSelector } from "@ngrx/store";
 import { ProductActionTypes, ProductActions } from "./product.actions";
+import { st } from "@angular/core/src/render3";
 
 /**
  * Extending the AppState to include what this module provides.
@@ -22,15 +23,16 @@ export interface AppState extends fromRoot.AppState {
 export interface ProductState {
     showProductCode: boolean;
     currentProduct: Product;
-    products: Product[]
+    products: Product[],
+    error: string
 }
 
 
 const initialState: ProductState = {
     showProductCode: false,
     currentProduct: null,
-    products: []
-
+    products: [],
+    error: ''
 }
 
 /**
@@ -60,6 +62,11 @@ export const getCurrentProduct = createSelector(
 export const getProducts = createSelector(
     getProductFeatureState,
     state => state.products
+);
+
+export const getError = createSelector(
+    getProductFeatureState,
+    state => state.error
 );
 
 export function reducer(state = initialState, action: ProductActions): ProductState {
@@ -93,6 +100,21 @@ export function reducer(state = initialState, action: ProductActions): ProductSt
                     starRating: 0
                 }
             }
+
+        case ProductActionTypes.LoadSuccess:
+            return {
+                ...state,
+                products: action.payload,
+                error: ''
+            }
+
+        case ProductActionTypes.LoadFail: {
+            return {
+                ...state,
+                products: [],
+                error: action.payload
+            };
+        }
         default:
             return state;
     }

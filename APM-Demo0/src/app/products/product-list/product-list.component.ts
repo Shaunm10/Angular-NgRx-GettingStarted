@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
-import { Subscription } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
 
 import { Product } from '../product';
 import { ProductService } from '../product.service';
@@ -9,6 +9,7 @@ import { Store, select } from '@ngrx/store';
 
 import * as fromProduct from '../state/product.reducer';
 import * as ProductActions from '../state/product.actions';
+import { takeWhile } from 'rxjs/operators';
 
 
 @Component({
@@ -17,41 +18,49 @@ import * as ProductActions from '../state/product.actions';
   styleUrls: ['./product-list.component.css']
 })
 export class ProductListComponent implements OnInit, OnDestroy {
+
   pageTitle = 'Products';
   errorMessage: string;
-
   displayCode: boolean;
-
   products: Product[];
+  showSpinner: boolean;
+  products$: Observable<Product[]>;
+  errorMessage$: Observable<string>;
 
   // Used to highlight the selected product in the list
   selectedProduct: Product | null;
 
-
   constructor(
     private productService: ProductService,
     private store: Store<fromProduct.AppState>) {
-
   }
 
   ngOnInit(): void {
 
-    /*this.sub = this.productService.selectedProductChanges$.subscribe(
-      selectedProduct => this.selectedProduct = selectedProduct
-    );*/
+    this.showSpinner = true;
+
+    // dispatch the call to load data, which will be handled by the effects.
+    this.store.dispatch(new ProductActions.Load());
+
+    // listen to the selection of gettingProducts
+    /*this.store.pipe(select(fromProduct.getProducts))
+      .subscribe(products => {
+        this.products = products;
+        this.showSpinner = false;
+      });*/
+    this.errorMessage$ = this.store.pipe(select(fromProduct.getError));
+    this.products$ = this.store.pipe(select(fromProduct.getProducts));
+
     //TODO: Unsubscribe
     this.store.pipe(select(fromProduct.getCurrentProduct)).subscribe(
       currentProduct => this.selectedProduct = currentProduct
     );
 
-    this.productService.getProducts().subscribe(
-      (products: Product[]) => this.products = products,
-      (err: any) => this.errorMessage = err.error
-    );
 
-    //this.store.pipe()
     // TODO: Unsubscribe to this.
-    this.store.pipe(select(fromProduct.getShowProductCode))
+    this.store.pipe(
+      select(fromProduct.getShowProductCode)
+    )
       .subscribe(showProductCode => {
         this.displayCode = showProductCode;
       });
@@ -77,5 +86,4 @@ export class ProductListComponent implements OnInit, OnDestroy {
   productSelected(product: Product): void {
     this.store.dispatch(new ProductActions.SetCurrentProduct(product));
   }
-
 }
