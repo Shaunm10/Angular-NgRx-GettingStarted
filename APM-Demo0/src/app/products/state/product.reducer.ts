@@ -32,6 +32,9 @@ const initialState: ProductState = {
 
 }
 
+/**
+ * private const, to only be used by this code file.
+ */
 const getProductFeatureState = createFeatureSelector<ProductState>('products')
 
 /**
