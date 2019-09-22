@@ -25,6 +25,10 @@ export class ClearCurrentProduct implements Action {
     readonly type = ProductActionTypes.ClearCurrentProduct;
 }
 
+/**
+ * Used to create a new product. This action sets the current product
+ * to a newly created product so the user may edit it.
+ */
 export class InitializeCurrentProduct implements Action {
     readonly type = ProductActionTypes.InitializeCurrentProduct;
 }
