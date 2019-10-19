@@ -157,6 +157,28 @@ export function reducer(state = initialState, action: ProductActions): ProductSt
                 ...state,
                 error: action.payload
             };
+
+        case ProductActionTypes.DeleteProductSuccess:
+            const indexOfDeletedItem = state.products.findIndex(p => p.id === action.payload);
+
+            // copy the array
+            const updatedProducts = state.products.slice(0);
+
+            // remove the item
+            updatedProducts.splice(indexOfDeletedItem, 1);
+
+            return {
+                ...state,
+                products: updatedProducts,
+                currentProductId: null,
+                error: ''
+            }
+
+        case ProductActionTypes.DeleteProductFail:
+            return {
+                ...state,
+                error: action.payload
+            };
         default:
             return state;
     }

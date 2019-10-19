@@ -53,4 +53,24 @@ export class ProductEffects {
       )
     )
   )
+
+  @Effect()
+  deleteProduct$: Observable<Action> = this.actions$.pipe(
+
+    // watch for just the DeleteProduct action
+    ofType(productActions.ProductActionTypes.DeleteProduct),
+
+    map((action: productActions.DeleteProduct) => action.payload),
+
+    mergeMap((productId: number) =>
+
+      // make the network call
+      this.productService.deleteProduct(productId).pipe(
+        map(() => (new productActions.DeleteProductSuccess(productId))),
+
+        // catch the error
+        catchError(err => of(new productActions.DeleteProductFail(err)))
+      )
+    )
+  )
 }
