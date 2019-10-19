@@ -4,7 +4,8 @@ import { ProductService } from '../product.service';
 import * as productActions from './product.actions';
 import { mergeMap, map, catchError } from 'rxjs/operators';
 import { Product } from '../product';
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
+import { Action } from '@ngrx/store';
 
 
 @Injectable({
@@ -16,7 +17,7 @@ export class ProductEffects {
     private productService: ProductService) { }
 
   @Effect()
-  loadProducts$ = this.actions$.pipe(
+  loadProducts$: Observable<Action> = this.actions$.pipe(
     // listen for only this action
     ofType(productActions.ProductActionTypes.Load),
     // when it's called call the getProducts on the Products Service (network request)
@@ -28,4 +29,28 @@ export class ProductEffects {
       ))
   )
 
+  @Effect()
+  updateProduct$: Observable<Action> = this.actions$.pipe(
+
+    // watch for just the UpdateProduct action
+    ofType(productActions.ProductActionTypes.UpdateProduct),
+
+    // get the product object from the action's payload.
+    map((action: productActions.UpdateProduct) => action.payload),
+
+    // passing that product, and the productService observable
+    // because we don't want nested observables, the mergeMap will 'flatten' the observables.
+    mergeMap((product: Product) =>
+
+      // make the network call
+      this.productService.updateProduct(product).pipe(
+
+        // the call was successful, so dispatch the success operation
+        map(updatedProduct => (new productActions.UpdateProductSuccess(updatedProduct))),
+
+        // or call error'ed, so dispatch the error operation.
+        catchError(err => of(new productActions.UpdateProductFail(err)))
+      )
+    )
+  )
 }
