@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
@@ -11,7 +11,8 @@ import * as fromProduct from '../../state/product.reducer';
 import * as ProductActions from '../../state/product.actions';
 
 @Component({
-  templateUrl: './product-shell.component.html'
+  templateUrl: './product-shell.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductShellComponent implements OnInit {
 
@@ -19,16 +20,6 @@ export class ProductShellComponent implements OnInit {
   displayCode$: Observable<boolean>;
   products$: Observable<Product[]>;
   selectedProduct$: Observable<Product>;
-  /*errorMessage: string;
-  displayCode: boolean;
-  products: Product[];
-  showSpinner: boolean;
-  products$: Observable<Product[]>;
-  errorMessage$: Observable<string>;
-
-  // Used to highlight the selected product in the list
-  selectedProduct: Product | null;
-  */
 
   constructor(
     private productService: ProductService,
