@@ -189,7 +189,8 @@ export function reducer(state = initialState, action: ProductActions): ProductSt
             newProducts.push(action.payload);
             return {
                 ...state,
-                products: newProducts
+                products: newProducts,
+                currentProductId: null
             }
         case ProductActionTypes.AddProductFail:
             return {
