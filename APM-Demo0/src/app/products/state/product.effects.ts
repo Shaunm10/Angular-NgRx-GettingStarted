@@ -73,4 +73,23 @@ export class ProductEffects {
       )
     )
   )
+
+  @Effect()
+  AddProduct$: Observable<Action> = this.actions$.pipe(
+
+    // watch just for the AddProduct action
+    ofType(productActions.ProductActionTypes.AddProduct),
+
+    map((action: productActions.AddProduct) => action.payload),
+
+    mergeMap((product: Product) =>
+
+      this.productService.createProduct(product).pipe(
+        map((product) => (new productActions.AddProductSuccess(product))),
+
+        // catch the error
+        catchError(err => of(new productActions.AddProductFail(err)))
+      )
+    )
+  )
 }

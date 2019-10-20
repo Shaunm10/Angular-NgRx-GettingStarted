@@ -8,6 +8,7 @@ import * as fromRoot from '../../state/app.state';
 import { createFeatureSelector, createSelector } from "@ngrx/store";
 import { ProductActionTypes, ProductActions } from "./product.actions";
 import { st } from "@angular/core/src/render3";
+import { ProductService } from "../product.service";
 
 /**
  * Extending the AppState to include what this module provides.
@@ -175,6 +176,22 @@ export function reducer(state = initialState, action: ProductActions): ProductSt
             }
 
         case ProductActionTypes.DeleteProductFail:
+            return {
+                ...state,
+                error: action.payload
+            };
+
+        case ProductActionTypes.AddProductSuccess:
+            // create a clone.
+            const newProducts = state.products.slice(0);
+
+            // add the item.
+            newProducts.push(action.payload);
+            return {
+                ...state,
+                products: newProducts
+            }
+        case ProductActionTypes.AddProductFail:
             return {
                 ...state,
                 error: action.payload
